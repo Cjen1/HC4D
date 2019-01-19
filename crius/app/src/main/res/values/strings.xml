@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Project Crius</string>
+    <string name="change_mode">Change Mode</string>
+    <string name="settings">Settings</string>
+</resources>
