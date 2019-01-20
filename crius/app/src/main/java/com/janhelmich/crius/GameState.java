@@ -1,12 +1,14 @@
 package com.janhelmich.crius;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.ar.sceneform.rendering.Color;
 import com.janhelmich.ar.smarthome.RequestSingleton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,17 +37,23 @@ public class GameState {
         score = 0;
 
         grid = new Color[rows][columns][height];
+
+        grid[0][0][0] = new Color(0.0f, 0.0f, 1.0f, 0.5f);
+        grid[1][1][1] = new Color(0.0f, 1.0f, 0.0f, 0.5f);
     }
 
     public void startGame() {
         // TODO: MAKE API CALL TO START GAME
         JsonObjectRequest jsonObjectRequest;
         jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, BASE_URL + "init/" +rows+"/"+columns+"/"+height, null, response -> {
+                (Request.Method.GET, BASE_URL + "init/" + rows + "/" + columns + "/" + height, null, response -> {
                     // DO NOTHING HERE
                 }, error -> {
                     //Log.i("Request Error", error.getMessage());
                 });
+
+        // Access the RequestQueue through your singleton class.
+        RequestSingleton.getInstance(this.context).addToRequestQueue(jsonObjectRequest);
     }
 
     public void updateState() {
@@ -53,14 +61,20 @@ public class GameState {
         jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, BASE_URL + "state", null, response -> {
                     try {
-                        JSONObject dimensions = (JSONObject) response.get("dim");
-
-                        if (((int)dimensions.get("lx")) == columns && ((int)dimensions.get("ly")) == height && ((int)dimensions.get("lz")) == rows) {
-                            int score = (int) response.get("score");
-                            this.score = score;
-                            String[][][] board = (String[][][]) response.get("board");
-                            updateBoard(board);
+                        JSONArray dimensions = (JSONArray) response.get("dim");
+                        int score = (int) response.get("score");
+                        this.score = score;
+                        JSONArray board = (JSONArray) response.get("board");
+                        String[][][] stringBoard = new String[columns][height][rows];
+                        for (int i = 0; i < board.length(); i++) {
+                            for (int j = 0; j < ((JSONArray) board.get(i)).length(); j++) {
+                                for (int k = 0; k < ((JSONArray) ((JSONArray) board.get(i)).get(j)).length(); j++) {
+                                    stringBoard[i][j][k] = (String) ((JSONArray) ((JSONArray) board.get(i)).get(j)).get(k);
+                                }
+                            }
                         }
+                        Log.i("BOARD", stringBoard.toString());
+                        updateBoard(stringBoard);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -75,12 +89,14 @@ public class GameState {
     }
 
     public void updateBoard(String[][][] board) {
-        for (int row = 0; row < rows; row ++) {
-            for (int col = 0; col < columns; col ++) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
                 for (int altitude = 0; altitude < height; altitude++) {
                     // TODO: ADJUST MAPPING ACCORDING TO JSON FORMAT
                     if (!board[col][altitude][row].equals("")) {
                         grid[row][col][altitude] = hex2Rgb(board[col][altitude][row]);
+                    } else {
+                        grid[row][col][altitude] = null;
                     }
                 }
             }
@@ -90,8 +106,8 @@ public class GameState {
 
     public static Color hex2Rgb(String colorStr) {
         return new Color(
-                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
-                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
-                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+                Integer.valueOf(colorStr.substring(1, 3), 16),
+                Integer.valueOf(colorStr.substring(3, 5), 16),
+                Integer.valueOf(colorStr.substring(5, 7), 16));
     }
 }

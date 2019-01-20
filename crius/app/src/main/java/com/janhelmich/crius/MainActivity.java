@@ -25,9 +25,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int ROW_COUNT = 3;
-    public static final int COLUMN_COUNT = 3;
-    public static final int HEIGHT = 3;
+    public static final int ROW_COUNT = 5;
+    public static final int COLUMN_COUNT = 5;
+    public static final int HEIGHT = 10;
     /**
      * Constants section for use in this class.
      */
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private GameState gameState;
+    private Grid grid;
 
     private boolean gridPlaced = false;
 
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        gameState = new GameState(3,4,5,fragment.getContext());
+        gameState = new GameState(ROW_COUNT,COLUMN_COUNT,HEIGHT,fragment.getContext());
     }
 
     private void onUpdate() {
@@ -139,6 +140,14 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == R.id.restart_rendering) {
+            this.gameState = new GameState(ROW_COUNT, COLUMN_COUNT, HEIGHT, fragment.getContext());
+            //this.gameState.startGame();
+            grid.setParent(null);
+            grid = null;
+        }
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -158,12 +167,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        gameState.startGame();
+        //gameState.startGame();
     }
 
     private void addNodeToScene(ArFragment fragment, Anchor anchor) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        Grid grid = new Grid(anchorNode, 0.2f, ROW_COUNT, COLUMN_COUNT, HEIGHT, this.fragment.getContext(), gameState);
+        grid = new Grid(anchorNode, 0.2f, ROW_COUNT, COLUMN_COUNT, HEIGHT, this.fragment.getContext(), gameState);
         grid.addGrid();
 
 

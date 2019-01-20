@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.janhelmich.crius.MainActivity">
     <item
-        android:id="@+id/change_mode"
+        android:id="@+id/restart_rendering"
         android:orderInCategory="100"
-        android:title="@string/change_mode"
+        android:title="@string/restart"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"

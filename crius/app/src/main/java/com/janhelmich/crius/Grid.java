@@ -50,7 +50,7 @@ public class Grid extends Node {
 
         addBottomPlane();
         addTopPlane();
-        fillTotalGrid();
+        //fillTotalGrid();
     }
 
     public void fillTotalGrid() {
@@ -80,6 +80,11 @@ public class Grid extends Node {
             for (int j = 0; j < columnCount; j++) {
                 for (int q = 0; q < height; q++) {
 
+                    nodeGrid[i][j][q] = null;
+                    if (nodeGrid[i][j][q] != null) {
+                        nodeGrid[i][j][q].setParent(null);
+                    }
+
                     if (gameState.grid[i][j][q] != null) {
                         final Color color = gameState.grid[i][j][q];
 
@@ -87,12 +92,6 @@ public class Grid extends Node {
                         cube.setLocalPosition(new Vector3(((columnCount / 2) - j) * lineLength, q * lineLength + 0.5f * lineLength, ((rowCount / 2) - i) * lineLength));
                         cube.setParent(this);
                         nodeGrid[i][j][q] = cube;
-                    } else {
-                        if (nodeGrid[i][j][q] != null) {
-                            nodeGrid[i][j][q].setParent(null);
-                        }
-                        nodeGrid[i][j][q] = null;
-
                     }
 
 
@@ -145,7 +144,7 @@ public class Grid extends Node {
     private Node makeOutlineCube(Vector3 dimensions) {
         Node cube = new Node();
 
-        final Color c = new Color(1.0f, 0.0f, 0.0f, 0.2f);
+        final Color c = new Color(1.0f, 1.0f, 1.0f, 0.4f);
 
         final Renderable[] cubeRenderable = new Renderable[1];
         MaterialFactory.makeTransparentWithColor(context, c)
@@ -163,8 +162,10 @@ public class Grid extends Node {
 
     @Override
     public void onUpdate(FrameTime frameTime) {
-        if (time+1000 < System.currentTimeMillis()) {
+        if (time+100 < System.currentTimeMillis()) {
+            gameState.updateState();
             fillGameStateGrid();
+            time = System.currentTimeMillis();
         }
     }
 
